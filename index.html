@@ -1,0 +1,155 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>A3</title>
+
+  <style>
+    html, body { width: 100%; height: 100%; margin: 0; } 
+   
+    .pt {
+      fill: red;
+    }
+
+    #vis {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 100%;
+      width: 100%;
+      background-color: black;
+    }
+
+    .orbit {
+      fill: none;
+      stroke: rgba(0, 255, 255, 0.25);
+    }
+
+    .sun {
+      fill: yellow;
+    }
+
+    .distance-axis {
+      opacity: 0.25;
+    }
+
+    .distance-axis text {
+      fill: white;
+    }
+
+    .distance-axis .tick line {
+      stroke: white;
+      stroke-width: 1px;
+    }
+
+    .distance-axis .domain { stroke: white; fill: none; }
+  </style>
+</head>
+<body>
+  <svg id="vis"></svg>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js"></script>
+  <script>
+    var sun = {r: 695500};
+    var planets = [
+      {"name":"Mercury", "ap": 69816900, "r": 2439.7},
+      {"name":"Venus", "ap": 108939000, "r": 6051.8},
+      {
+        "name":"Earth",
+        "ap": 151930000,
+        "r": 6371.0,
+        "moons": [
+          {"name":"Moon (Luna)", "ap":405400, "r": 1737.10}
+        ]
+      },
+      {"name":"Mars", "ap": 249.2e6, "r": 3389.5},
+      {"name":"Jupiter", "ap": 816520800, "r": 69911},
+      {"name":"Saturn", "ap": 1513325783, "r": 58232},
+      {"name":"Uranus", "ap": 3006224700, "r": 25362},
+      {"name":"Neptune", "ap": 4537580900, "r": 24622}
+    ];
+
+
+    window.onload = function() {
+      var RECT = document.getElementById("vis").getBoundingClientRect();
+      var WIDTH = RECT.right - RECT.left;
+      var HEIGHT = RECT.bottom - RECT.top;
+
+      var zoom = Math.min(WIDTH/2, HEIGHT/2);
+
+      console.log("w", WIDTH, "h", HEIGHT);
+
+      var ap = function(d) { return d.ap; };
+
+      var r = d3.scale.linear()
+        .domain([0, sun.r])
+        .range([0.5, 40]);
+
+      var svg = d3.select("#vis")
+        .append("g") // use a group to translate our coordinates to the center
+          .attr("transform", "translate(" + WIDTH/2 + "," + HEIGHT/2 + ")");
+      
+      svg.append("circle")
+        .datum(sun)
+        .attr("class", "sun")
+        .attr("r", function(d) { return r(d.r); })
+        .attr("cx", 0)
+        .attr("cy", 0)
+
+      render();
+
+      document.addEventListener("DOMMouseScroll", function(e) {
+        console.log(e.detail)
+        if (e.detail < 0) {
+          zoom /= 1.1;
+        } else {
+          zoom *= 1.1;
+        }
+        render();
+      });
+
+      function render() {
+        var x = d3.scale.linear()
+          .domain([sun.r, d3.max(planets, ap)])
+          .range([r(sun.r), zoom]).nice();
+
+        var xAxis = d3.svg.axis().scale(x).ticks(0, "e");
+
+        var pts = svg.selectAll(".pt")
+          .data(planets)
+
+        // distance axis
+        svg.select(".distance-axis")
+            .attr("class", "distance-axis")
+            .call(xAxis);
+
+        // orbit lines
+        function orbit(d) {
+          d.attr("cx", 0)
+          .attr("cy", 0)
+          .attr("r", function(d) { return x(d.ap); })
+          .attr("class", "orbit")
+        }
+        var orbits = svg.selectAll(".orbit").data(planets);
+        orbits.call(orbit);
+        orbits.enter().append("circle").call(orbit);
+        orbits.exit().remove();
+
+        // bodies
+        function body(d) {
+          d.attr("cx", function(d) { return x(d.ap); })
+          .attr("cy", 0)
+          .attr("r", function(d) { return r(d.r); })
+          .attr("class", "pt")
+        }
+        
+        pts.call(body);
+        pts.enter().append("circle").call(body);
+        pts.exit().remove()
+      }
+
+    };
+  </script>
+</body>
+</html>
