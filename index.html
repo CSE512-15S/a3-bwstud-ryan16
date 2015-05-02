@@ -49,25 +49,55 @@
 </head>
 <body>
   <svg id="vis"></svg>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js"></script>
+  <script src="lib/d3.min.js"></script>
+  <script src="lib/timbre.js"></script>
   <script>
+    var notes = ['A', 'A#/Bb', 'B', 'C', 'C#/Db', 'D', 'D#/Eb', 'E', 'F', 'F#/Gb', 'G', 'G#/Ab'];    
+    var note = function(freq) {
+      return notes[(Math.round(12*(Math.log(freq/440) / Math.log(2))))%12];
+    }
+
+    console.log(note(1232));
+
+    var synth = T("OscGen", {wave:"sin", mul:0.5});
+
+    T("interval", {interval: 300, timeout:"5sec"}, function() {
+        synth.noteOnWithFreq(400, 80);
+    }).on("ended", function() {
+        this.stop();
+    }).set({buddies:synth}).start();
+
+    T("interval", {interval: 400, timeout:"5sec"}, function() {
+        synth.noteOnWithFreq(300, 80);
+    }).on("ended", function() {
+        this.stop();
+    }).set({buddies:synth}).start();
+
+
+    T("interval", {interval: 100, timeout:"5sec"}, function() {
+        synth.noteOnWithFreq(800, 80);
+    }).on("ended", function() {
+        this.stop();
+    }).set({buddies:synth}).start();
+
     var sun = {r: 695500};
     var planets = [
-      {"name":"Mercury", "ap": 69816900, "r": 2439.7},
-      {"name":"Venus", "ap": 108939000, "r": 6051.8},
+      {"name":"Mercury", "ap": 69816900, "r": 2439.7, "color": "#999"},
+      {"name":"Venus", "ap": 108939000, "r": 6051.8, "color": "#EA0"},
       {
         "name":"Earth",
         "ap": 151930000,
         "r": 6371.0,
+        "color": "#03F",
         "moons": [
           {"name":"Moon (Luna)", "ap":405400, "r": 1737.10}
         ]
       },
-      {"name":"Mars", "ap": 249.2e6, "r": 3389.5},
-      {"name":"Jupiter", "ap": 816520800, "r": 69911},
-      {"name":"Saturn", "ap": 1513325783, "r": 58232},
-      {"name":"Uranus", "ap": 3006224700, "r": 25362},
-      {"name":"Neptune", "ap": 4537580900, "r": 24622}
+      {"name":"Mars", "ap": 249.2e6, "r": 3389.5, "color": "#F00"},
+      {"name":"Jupiter", "ap": 816520800, "r": 69911, "color": "#FA1"},
+      {"name":"Saturn", "ap": 1513325783, "r": 58232, "color": "#FD1", "rings": true},
+      {"name":"Uranus", "ap": 3006224700, "r": 25362, "color": "#0FF"},
+      {"name":"Neptune", "ap": 4537580900, "r": 24622, "color": "#00F"}
     ];
 
 
@@ -84,7 +114,7 @@
 
       var r = d3.scale.linear()
         .domain([0, sun.r])
-        .range([0.5, 40]);
+        .range([1, 30]);
 
       var svg = d3.select("#vis")
         .append("g") // use a group to translate our coordinates to the center
@@ -100,13 +130,16 @@
       render();
 
       document.addEventListener("DOMMouseScroll", function(e) {
-        console.log(e.detail)
         if (e.detail < 0) {
           zoom /= 1.1;
         } else {
           zoom *= 1.1;
         }
         render();
+      });
+
+      document.addEventListener("mousemove", function(e) {
+        console.log(e.layerX);
       });
 
       function render() {
@@ -138,16 +171,25 @@
 
         // bodies
         function body(d) {
-          d.attr("cx", function(d) { return x(d.ap); })
-          .attr("cy", 0)
-          .attr("r", function(d) { return r(d.r); })
-          .attr("class", "pt")
+          var theta = Math.PI;
+          d.attr("cx", function(d) { return Math.cos(theta)*x(d.ap); })
+           .attr("cy", function(d) { return -Math.sin(theta)*x(d.ap); })
+           .attr("r", function(d) { return r(d.r); })
+           .attr("class", "pt")
+           .attr("style", function(d) { return "fill:" + (d.color || "red"); })
         }
         
         pts.call(body);
         pts.enter().append("circle").call(body);
         pts.exit().remove()
       }
+
+      requestAnimationFrame(function frame() {
+        // rendering
+        
+
+        requestAnimationFrame(frame);
+      });
 
     };
   </script>
