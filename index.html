@@ -57,28 +57,30 @@
       return notes[(Math.round(12*(Math.log(freq/440) / Math.log(2))))%12];
     }
 
+
+
     console.log(note(1232));
 
     var synth = T("OscGen", {wave:"sin", mul:0.5});
 
-    T("interval", {interval: 300, timeout:"5sec"}, function() {
-        synth.noteOnWithFreq(400, 80);
-    }).on("ended", function() {
-        this.stop();
-    }).set({buddies:synth}).start();
+    // T("interval", {interval: 300, timeout:"5sec"}, function() {
+    //     synth.noteOnWithFreq(400, 80);
+    // }).on("ended", function() {
+    //     this.stop();
+    // }).set({buddies:synth}).start();
 
-    T("interval", {interval: 400, timeout:"5sec"}, function() {
-        synth.noteOnWithFreq(300, 80);
-    }).on("ended", function() {
-        this.stop();
-    }).set({buddies:synth}).start();
+    // T("interval", {interval: 400, timeout:"5sec"}, function() {
+    //     synth.noteOnWithFreq(300, 80);
+    // }).on("ended", function() {
+    //     this.stop();
+    // }).set({buddies:synth}).start();
 
 
-    T("interval", {interval: 100, timeout:"5sec"}, function() {
-        synth.noteOnWithFreq(800, 80);
-    }).on("ended", function() {
-        this.stop();
-    }).set({buddies:synth}).start();
+    // T("interval", {interval: 100, timeout:"5sec"}, function() {
+    //     synth.noteOnWithFreq(800, 80);
+    // }).on("ended", function() {
+    //     this.stop();
+    // }).set({buddies:synth}).start();
 
     var sun = {r: 695500};
     var planets = [
@@ -125,7 +127,8 @@
         .attr("class", "sun")
         .attr("r", function(d) { return r(d.r); })
         .attr("cx", 0)
-        .attr("cy", 0)
+        .attr("cy", 0);
+
 
       render();
 
@@ -139,8 +142,11 @@
       });
 
       document.addEventListener("mousemove", function(e) {
-        console.log(e.layerX);
+        // console.log(e.layerX);
       });
+
+      
+     
 
       function render() {
         var x = d3.scale.linear()
@@ -150,7 +156,7 @@
         var xAxis = d3.svg.axis().scale(x).ticks(0, "e");
 
         var pts = svg.selectAll(".pt")
-          .data(planets)
+          .data(planets);
 
         // distance axis
         svg.select(".distance-axis")
@@ -162,7 +168,7 @@
           d.attr("cx", 0)
           .attr("cy", 0)
           .attr("r", function(d) { return x(d.ap); })
-          .attr("class", "orbit")
+          .attr("class", "orbit");
         }
         var orbits = svg.selectAll(".orbit").data(planets);
         orbits.call(orbit);
@@ -176,12 +182,44 @@
            .attr("cy", function(d) { return -Math.sin(theta)*x(d.ap); })
            .attr("r", function(d) { return r(d.r); })
            .attr("class", "pt")
-           .attr("style", function(d) { return "fill:" + (d.color || "red"); })
+           .attr("style", function(d) { return "fill:" + (d.color || "red"); });
         }
         
         pts.call(body);
         pts.enter().append("circle").call(body);
-        pts.exit().remove()
+        pts.exit().remove();
+
+        planet_targets = document.querySelectorAll(".pt");
+        for(var i = 1;i<planet_targets.length;i++){
+          planet_targets[i].addEventListener("click", piano);
+        }
+
+        // var piano = function(d){
+        //   alert("hey");
+        // // display keyboard
+        // // determine key based on frequency
+        // // append indicator above key
+        //   d3.select("#vis")
+        //     .data(notes)
+        //     .enter()
+        //     .append("rect")
+        //     .attr({
+        //       x: function(d, i){
+        //         return 20*i;
+        //       },
+        //       y: function(d, i){
+        //         return 0;
+        //         //differentiate black and white keys
+        //       },
+        //       height: 100,
+        //       width: 20,
+        //       fill: "red"
+        //       // text: function(d){
+        //       //   return d;
+        //       // }
+        //     });
+        // }
+
       }
 
       requestAnimationFrame(function frame() {
@@ -190,8 +228,72 @@
 
         requestAnimationFrame(frame);
       });
-
+      var piano = function(d){
+          alert("hey");
+        // display keyboard
+        // determine key based on frequency
+        // append indicator above key
+          d3.select("#vis")
+            .data(notes)
+            .enter()
+            .append("rect")
+            .attr({
+              x: function(d, i){
+                return 20*i;
+              },
+              y: function(d, i){
+                return 0;
+                //differentiate black and white keys
+              },
+              height: 100,
+              width: 20,
+              fill: "red"
+              // text: function(d){
+              //   return d;
+              // }
+            });
+        }
     };
+     
+
+     
+
+     var planet_targets;
+
+      
+     function ho(){
+        alert("ho");
+      }
+      // var piano = function(d){
+      //     alert("hey");
+      //   // display keyboard
+      //   // determine key based on frequency
+      //   // append indicator above key
+      //     d3.select("#vis")
+      //       .data(notes)
+      //       .enter()
+      //       .append("rect")
+      //       .attr({
+      //         x: function(d, i){
+      //           return 20*i;
+      //         },
+      //         y: function(d, i){
+      //           return 0;
+      //           //differentiate black and white keys
+      //         },
+      //         height: 100,
+      //         width: 20,
+      //         fill: "red"
+      //         // text: function(d){
+      //         //   return d;
+      //         // }
+      //       });
+      //   }
+
+
+      function display(){
+
+      }
   </script>
 </body>
 </html>
