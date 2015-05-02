@@ -27,6 +27,10 @@
       stroke: rgba(0, 255, 255, 0.25);
     }
 
+    .orbit.selected {
+      stroke: rgba(255, 0, 255, 0.25);
+    }
+
     .sun {
       fill: yellow;
     }
@@ -48,59 +52,37 @@
   </style>
 </head>
 <body>
-  <svg id="vis"></svg>
+  <svg id="vis"><text x=0 y=20 fill=white id="current">Current</text></svg>
   <script src="lib/d3.min.js"></script>
   <script src="lib/timbre.js"></script>
   <script src="data.js"></script>
+  <script src="sound.js"></script>
   <script>
-    var notes = ['A', 'A#/Bb', 'B', 'C', 'C#/Db', 'D', 'D#/Eb', 'E', 'F', 'F#/Gb', 'G', 'G#/Ab'];    
-    var note = function(freq) {
-      return notes[(Math.round(12*(Math.log(freq/440) / Math.log(2))))%12];
-    }
-
-    console.log(note(1232));
-
-    var synth = T("OscGen", {wave:"sin", mul:0.5});
-
-    T("interval", {interval: 300, timeout:"5sec"}, function() {
-        synth.noteOnWithFreq(400, 80);
-    }).on("ended", function() {
-        this.stop();
-    }).set({buddies:synth}).start();
-
-    T("interval", {interval: 400, timeout:"5sec"}, function() {
-        synth.noteOnWithFreq(300, 80);
-    }).on("ended", function() {
-        this.stop();
-    }).set({buddies:synth}).start();
-
-
-    T("interval", {interval: 100, timeout:"5sec"}, function() {
-        synth.noteOnWithFreq(800, 80);
-    }).on("ended", function() {
-        this.stop();
-    }).set({buddies:synth}).start();
-
     var currentView = sun;
-
     window.onload = function() {
-      var RECT = document.getElementById("vis").getBoundingClientRect();
-      var WIDTH = RECT.right - RECT.left;
-      var HEIGHT = RECT.bottom - RECT.top;
+      var RECT, WIDTH, HEIGHT, zoom;
 
-      var zoom = Math.min(WIDTH/2, HEIGHT/2);
+      var svg = d3.select("#vis")
+        .append("g") // use a group to translate our coordinates to the center
+          .attr("class", "container")
 
-      console.log("w", WIDTH, "h", HEIGHT);
+      // resize the visualization
+      window.addEventListener('resize', handleResize);
+      function handleResize() {
+        RECT = document.getElementById("vis").getBoundingClientRect();
+        WIDTH = RECT.right - RECT.left;
+        HEIGHT = RECT.bottom - RECT.top; 
+        d3.select(".container")
+          .attr("transform", "translate(" + WIDTH/2 + "," + HEIGHT/2 + ")");
+      }
+      handleResize();
+      zoom = 0.9*Math.min(WIDTH/2, HEIGHT/2);
 
       var ap = function(d) { return d.ap; };
 
       var r = d3.scale.linear()
         .domain([0, currentView.r])
         .range([1, 30]);
-
-      var svg = d3.select("#vis")
-        .append("g") // use a group to translate our coordinates to the center
-          .attr("transform", "translate(" + WIDTH/2 + "," + HEIGHT/2 + ")");
       
       svg.append("circle")
         .datum(currentView)
@@ -111,25 +93,47 @@
 
       render();
 
-      document.addEventListener("DOMMouseScroll", function(e) {
-        if (e.detail < 0) {
+      document.addEventListener("DOMMouseScroll", handleWheel);
+      document.addEventListener("mousewheel", handleWheel);
+      function handleWheel(e) {
+        var delta = Math.max(-1, Math.min(1, (e.wheelDelta || -e.detail)));
+        if (delta < 0) {
           zoom /= 1.1;
         } else {
           zoom *= 1.1;
         }
         render();
-      });
-
-      document.addEventListener("mousemove", function(e) {
-        console.log(e.layerX);
-      });
+        e.preventDefault();
+      }
 
       function render() {
-        var x = d3.scale.linear()
+        var dist = d3.scale.linear()
           .domain([currentView.r, d3.max(currentView.satellites, ap)])
-          .range([r(currentView.r), zoom]).nice();
+          .range([r(currentView.r), zoom]);
 
-        var xAxis = d3.svg.axis().scale(x).ticks(0, "e");
+        var minBody;
+        document.addEventListener("mousemove", function(e) {
+          var x = e.layerX - WIDTH/2,
+              y = e.layerY - HEIGHT/2,
+              r = Math.sqrt(x*x + y*y);
+          var mouseDist = dist.invert(r);
+          var min;
+          if (mouseDist < currentView.r) {
+            minBody = currentView.name;
+          } else currentView.satellites.forEach(function(body) {
+            if (min == null) {
+              min = Math.abs(body.ap - mouseDist);
+              minBody = body.name;
+            } else if (Math.abs(body.ap - mouseDist) < min) {
+              min = Math.abs(body.ap - mouseDist);
+              minBody = body.name;
+            }
+          });
+          d3.select("#current").html(minBody)
+        });
+
+
+        var xAxis = d3.svg.axis().scale(dist).ticks(0, "e");
 
         var pts = svg.selectAll(".pt")
           .data(currentView.satellites)
@@ -143,8 +147,8 @@
         function orbit(d) {
           d.attr("cx", 0)
           .attr("cy", 0)
-          .attr("r", function(d) { return x(d.ap); })
-          .attr("class", "orbit")
+          .attr("r", function(d) { return dist(d.ap); })
+          .attr("class", function(d) { return d.name === minBody ? "orbit selected" : "orbit"; })
         }
         var orbits = svg.selectAll(".orbit").data(currentView.satellites);
         orbits.call(orbit);
@@ -153,9 +157,8 @@
 
         // bodies
         function body(d) {
-          var theta = Math.PI;
-          d.attr("cx", function(d) { return Math.cos(theta)*x(d.ap); })
-           .attr("cy", function(d) { return -Math.sin(theta)*x(d.ap); })
+          d.attr("cx", function(d) { return Math.cos(d.period)*dist(d.ap); })
+           .attr("cy", function(d) { return -Math.sin(d.period)*dist(d.ap); })
            .attr("r", function(d) { return r(d.r); })
            .attr("class", "pt")
            .attr("style", function(d) { return "fill:" + (d.color || "red"); })
@@ -168,8 +171,7 @@
 
       requestAnimationFrame(function frame() {
         // rendering
-        
-
+       
         requestAnimationFrame(frame);
       });
 
