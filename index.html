@@ -11,6 +11,20 @@
       fill: red;
     }
 
+    .pt.selected {
+      stroke: rgba(0, 255, 255, 0.15);
+      stroke-width: 12px;
+    }
+
+    #preview {
+      background-image: url(pics/spin.gif);
+	    background-repeat: no-repeat;
+      background-position: center;
+      display:block;
+      border:none;
+      object-fit: contain;
+    }
+
     #vis {
       position: absolute;
       top: 0;
@@ -25,12 +39,15 @@
     .orbit {
       fill: none;
       stroke: rgba(0, 255, 255, 0.25);
+      /* stroke-dasharray: 10,10; */
     }
 
     .orbit.selected {
       /* stroke: rgba(127, 255, 127, 0.25); */
-      stroke-dasharray: 2,2;
+      stroke-dasharray: 10, 5;
     }
+
+
 
     .sun {
       fill: yellow;
@@ -49,17 +66,26 @@
       stroke-width: 1px;
     }
 
+    #tooltip {
+      position: absolute;
+      top: 0;
+      left: 0;
+      color: white;
+      background-color: rgba(0, 0, 0, 1)
+    }
+
     .distance-axis .domain { stroke: white; fill: none; }
   </style>
 </head>
 <body>
-  <svg id="vis"><text x=0 y=20 fill=white id="current">Current</text></svg>
+  <svg id="vis"></svg>
+  <div id="tooltip"><div id="current"></div><img id="preview" width=200 height=200 /><div id="info"></div></div>
   <script src="lib/d3.min.js"></script>
   <script src="lib/timbre.js"></script>
   <script src="data.js"></script>
   <script src="sound.js"></script>
   <script>
-    var currentView = sun.satellites[5];
+    var currentView = sun.satellites[3];
     window.onload = function() {
       var RECT, WIDTH, HEIGHT, zoom;
 
@@ -110,6 +136,10 @@
         e.preventDefault();
       }
 
+      function tooltip() {
+        
+      }
+
       var minBody;
       var currentMouseEvent;
       document.addEventListener("mousemove", handleMouseMove);
@@ -120,19 +150,30 @@
             r = Math.sqrt(x*x + y*y);
         var mouseDist = dist.invert(r);
         var min;
-        if (mouseDist < currentView.r) {
+        var minData;
+        if (mouseDist < currentView.r || currentView.satellites.length == 0) {
           minBody = currentView.name;
+          minData = currentView;
         } else currentView.satellites.forEach(function(body) {
           if (min == null) {
             min = Math.abs(body.ap - mouseDist);
             minBody = body.name;
+            minData = body;
           } else if (Math.abs(body.ap - mouseDist) < min) {
             min = Math.abs(body.ap - mouseDist);
             minBody = body.name;
+            minData = body;
           }
         });
-        d3.select("#current").html(minBody);
-        d3.selectAll(".orbit").attr("class", function(d) { return d.name === minBody ? "orbit selected" : "orbit"; })
+        if (minBody) {
+          d3.select("#current").html(minBody);
+          d3.select("#preview")
+            .attr("src", "pics/" + minBody.toLowerCase() + ".jpg")
+            .attr("alt", minBody);
+          d3.select("#info").html("<strong>Radius:</strong> " + minData.r + " km<br /><strong>Orbital period:</strong> " + minData.period + " days<br/><strong>Apoapsis:</strong> " + minData.ap + " km");
+          d3.selectAll(".orbit").attr("class", function(d) { return d.name === minBody ? "orbit selected" : "orbit"; })
+          d3.selectAll(".pt").attr("class", function(d) { return d.name === minBody ? "pt selected" : "pt"; })
+        }
       }
 
       function render() {
@@ -157,24 +198,29 @@
         orbits.exit().remove();
 
         // bodies
-        function body(d) {
-          d.attr("cx", function(d) { return Math.cos(d.period)*dist(d.ap); })
-           .attr("cy", function(d) { return -Math.sin(d.period)*dist(d.ap); })
-        }
-        
-        pts.call(body);
+
         pts.enter().append("circle")
            .attr("r", function(d) { return r(d.r); })
            .attr("class", "pt")
            .attr("style", function(d) { return "fill:" + (d.color || "red"); })
-           .call(body);
         pts.exit().remove()
       }
 
+      var t = 0;
+      var dt = 0.1;
+
+      var pts = d3.selectAll(".pt");
+      var orbits = d3.selectAll(".orbit");
       requestAnimationFrame(function frame() {
         // rendering
-        
-        d3.select(".pt")
+        t += dt;    
+
+        //orbits.attr("style", function(d) { return "stroke-dashoffset: " + 20*t/d.period + "%"; });
+        //*
+        pts
+          .attr("cx", function(d) { return Math.cos(t/d.period)*dist(d.ap); })
+          .attr("cy", function(d) { return -Math.sin(t/d.period)*dist(d.ap); })
+        //*/
         requestAnimationFrame(frame);
       });
 
