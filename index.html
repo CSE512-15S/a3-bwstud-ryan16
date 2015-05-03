@@ -84,6 +84,8 @@
       var r = d3.scale.linear()
         .domain([0, currentView.r])
         .range([1, 30]);
+
+      var dist = d3.scale.linear()
       
       svg.append("circle")
         .datum(currentView)
@@ -104,35 +106,38 @@
           zoom *= 1.1;
         }
         render();
+        handleMouseMove(currentMouseEvent);
         e.preventDefault();
       }
 
-      function render() {
-        var dist = d3.scale.linear()
-          .domain([currentView.r, d3.max(currentView.satellites, ap)])
-          .range([r(currentView.r), zoom]);
-
-        var minBody;
-        document.addEventListener("mousemove", function(e) {
-          var x = e.layerX - WIDTH/2,
-              y = e.layerY - HEIGHT/2,
-              r = Math.sqrt(x*x + y*y);
-          var mouseDist = dist.invert(r);
-          var min;
-          if (mouseDist < currentView.r) {
-            minBody = currentView.name;
-          } else currentView.satellites.forEach(function(body) {
-            if (min == null) {
-              min = Math.abs(body.ap - mouseDist);
-              minBody = body.name;
-            } else if (Math.abs(body.ap - mouseDist) < min) {
-              min = Math.abs(body.ap - mouseDist);
-              minBody = body.name;
-            }
-          });
-          d3.select("#current").html(minBody);
-          d3.selectAll(".orbit").attr("class", function(d) { return d.name === minBody ? "orbit selected" : "orbit"; })
+      var minBody;
+      var currentMouseEvent;
+      document.addEventListener("mousemove", handleMouseMove);
+      function handleMouseMove(e) {
+        currentMouseEvent = e;
+        var x = e.layerX - WIDTH/2,
+            y = e.layerY - HEIGHT/2,
+            r = Math.sqrt(x*x + y*y);
+        var mouseDist = dist.invert(r);
+        var min;
+        if (mouseDist < currentView.r) {
+          minBody = currentView.name;
+        } else currentView.satellites.forEach(function(body) {
+          if (min == null) {
+            min = Math.abs(body.ap - mouseDist);
+            minBody = body.name;
+          } else if (Math.abs(body.ap - mouseDist) < min) {
+            min = Math.abs(body.ap - mouseDist);
+            minBody = body.name;
+          }
         });
+        d3.select("#current").html(minBody);
+        d3.selectAll(".orbit").attr("class", function(d) { return d.name === minBody ? "orbit selected" : "orbit"; })
+      }
+
+      function render() {
+       dist.domain([currentView.r, d3.max(currentView.satellites, ap)])
+           .range([r(currentView.r), zoom]);
 
         var pts = svg.selectAll(".pt")
           .data(currentView.satellites)
@@ -168,7 +173,8 @@
 
       requestAnimationFrame(function frame() {
         // rendering
-       
+        
+        d3.select(".pt")
         requestAnimationFrame(frame);
       });
 
