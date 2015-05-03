@@ -28,7 +28,8 @@
     }
 
     .orbit.selected {
-      stroke: rgba(255, 0, 255, 0.25);
+      /* stroke: rgba(127, 255, 127, 0.25); */
+      stroke-dasharray: 2,2;
     }
 
     .sun {
@@ -58,7 +59,7 @@
   <script src="data.js"></script>
   <script src="sound.js"></script>
   <script>
-    var currentView = sun;
+    var currentView = sun.satellites[4];
     window.onload = function() {
       var RECT, WIDTH, HEIGHT, zoom;
 
@@ -129,43 +130,39 @@
               minBody = body.name;
             }
           });
-          d3.select("#current").html(minBody)
+          d3.select("#current").html(minBody);
+          d3.selectAll(".orbit").attr("class", function(d) { return d.name === minBody ? "orbit selected" : "orbit"; })
         });
-
-
-        var xAxis = d3.svg.axis().scale(dist).ticks(0, "e");
 
         var pts = svg.selectAll(".pt")
           .data(currentView.satellites)
 
-        // distance axis
-        svg.select(".distance-axis")
-            .attr("class", "distance-axis")
-            .call(xAxis);
-
         // orbit lines
         function orbit(d) {
-          d.attr("cx", 0)
-          .attr("cy", 0)
-          .attr("r", function(d) { return dist(d.ap); })
-          .attr("class", function(d) { return d.name === minBody ? "orbit selected" : "orbit"; })
+          d.attr("r", function(d) { return dist(d.ap); })
         }
         var orbits = svg.selectAll(".orbit").data(currentView.satellites);
         orbits.call(orbit);
-        orbits.enter().append("circle").call(orbit);
+        orbits.enter()
+          .append("circle")
+          .attr("class", "orbit")
+          .attr("cx", 0)
+          .attr("cy", 0)
+          .call(orbit);
         orbits.exit().remove();
 
         // bodies
         function body(d) {
           d.attr("cx", function(d) { return Math.cos(d.period)*dist(d.ap); })
            .attr("cy", function(d) { return -Math.sin(d.period)*dist(d.ap); })
-           .attr("r", function(d) { return r(d.r); })
-           .attr("class", "pt")
-           .attr("style", function(d) { return "fill:" + (d.color || "red"); })
         }
         
         pts.call(body);
-        pts.enter().append("circle").call(body);
+        pts.enter().append("circle")
+           .attr("r", function(d) { return r(d.r); })
+           .attr("class", "pt")
+           .attr("style", function(d) { return "fill:" + (d.color || "red"); })
+           .call(body);
         pts.exit().remove()
       }
 
