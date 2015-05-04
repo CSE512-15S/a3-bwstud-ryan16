@@ -150,7 +150,8 @@
         .range([1, 30]);
 
       var dist = d3.scale.linear();
-      var distAxis = d3.svg.axis().scale(dist);
+      var tickFormatter = d3.format(",.0f");
+      var distAxis = d3.svg.axis().scale(dist).tickFormat(function(d){ return tickFormatter(d) + "km"; });
       // render the central body
       svg.append("circle")
         .datum(currentView)
