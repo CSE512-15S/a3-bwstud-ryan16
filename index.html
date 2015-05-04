@@ -92,7 +92,7 @@
       color: white;
       background: none;
       font-family: 'Cutive Mono';
-      font-size: .618em;
+      font-size: .8em;
       width: 200px;
     }
 
@@ -199,12 +199,13 @@
       }
 
       var minBody;
+      var selectedRing;
       var currentMouseEvent;
       document.addEventListener("mousemove", handleMouseMove);
       function handleMouseMove(e) {
         currentMouseEvent = e;
-        var x = e.layerX - CENTER_X,
-            y = e.layerY - CENTER_Y,
+        var x = e.pageX - CENTER_X,
+            y = e.pageY - CENTER_Y,
             r = Math.sqrt(x*x + y*y);
         var mouseDist = dist.invert(r);
         var min;
@@ -212,17 +213,31 @@
         if (mouseDist < currentView.r || currentView.satellites.length == 0) {
           minBody = currentView.name;
           minData = currentView;
-        } else currentView.satellites.forEach(function(body) {
-          if (min == null) {
-            min = Math.abs(body.ap - mouseDist);
-            minBody = body.name;
-            minData = body;
-          } else if (Math.abs(body.ap - mouseDist) < min) {
-            min = Math.abs(body.ap - mouseDist);
-            minBody = body.name;
-            minData = body;
-          }
-        });
+        } else {
+          selectedRing = 'none';
+          currentView.rings && currentView.rings.forEach(function(ring, i) {
+            var e = dist(ring.e),
+                s = dist(ring.s);
+            if (s - 10*!!ring.small < r && e + 10*!!ring.small > r) {
+              // pick the smallest ring when close by.
+              if (!currentView.rings[selectedRing] || (ring.e - ring.s < currentView.rings[selectedRing].e - currentView.rings[selectedRing].s)) {
+                selectedRing = i;
+                console.log(ring.name);
+              }
+            }
+          })
+          currentView.satellites.forEach(function(body) {
+            if (min == null) {
+              min = Math.abs(body.ap - mouseDist);
+              minBody = body.name;
+              minData = body;
+            } else if (Math.abs(body.ap - mouseDist) < min) {
+              min = Math.abs(body.ap - mouseDist);
+              minBody = body.name;
+              minData = body;
+            }
+          });
+        }
         if (minBody) {
           d3.select("#current").html(minBody.toUpperCase());
           d3.select("#preview")
@@ -233,6 +248,8 @@
           d3.selectAll(".orbit").attr("class", function(d) { return d.name === minBody ? "orbit selected" : "orbit"; })
           d3.selectAll(".pt").attr("class", function(d) { return d.name === minBody ? "pt selected" : "pt"; })
         }
+        rings.attr('stroke', function(_, i) { if (i === selectedRing) { console.log(i); return 'rgba(0,255,255,0.2)'; } return ''; })
+             .style('fill',  function(d, i) { if (i === selectedRing) { console.log(i); return 'rgba(0,255,255,0.2)'; } return d.color; })
       }
 
 

@@ -113,25 +113,29 @@ sun = {
           "name": "Titan Ringlet",
           "s": "77871",
           "e": "77896",
-          "color": "rgba(255,127,0,0.8)"
+          "color": "rgba(255,127,0,0.8)",
+          "small": true
         },
         {
           "name": "Maxwell Ringlet",
           "s": "87491",
           "e": "87555",
-          "color": "rgba(255,127,0,0.8)"
+          "color": "rgba(255,127,0,0.8)",
+          "small": true
         },
         {
           "name": "1.470 Rs Ringlet",
           "s": "88716",
           "e": "88732",
-          "color": "rgba(255,127,0,0.8)"
+          "color": "rgba(255,127,0,0.8)",
+          "small": true
         },
         {
           "name": "1.495 Rs Ringlet",
           "s": "90171",
           "e": "90232",
-          "color": "rgba(255,127,0,0.8)"
+          "color": "rgba(255,127,0,0.8)",
+          "small": true
         },
         {
           "name": "B Ring",
@@ -149,7 +153,8 @@ sun = {
           "name": "Huygens Ringlet",
           "s": "117825",
           "e": "118185",
-          "color": "rgba(255,127,0,0.8)"
+          "color": "rgba(255,127,0,0.8)",
+          "small": true
         },
         {
           "name": "A Ring",
@@ -161,19 +166,22 @@ sun = {
           "name": "Encke Gap",
           "s": "133410",
           "e": "133740",
-          "color": "rgba(0,0,0,0.5)"
+          "color": "rgba(0,0,0,0.5)",
+          "small": true
         },
         {
           "name": "Keeler Gap",
           "s": "136487",
           "e": "136522",
-          "color": "rgba(0,0,0,1)"
+          "color": "rgba(0,0,0,1)",
+          "small": true
         },
         {
           "name": "F Ring ",
           "s": "139826",
           "e": "140612",
-          "color": "rgba(255,127,0,0.2)"
+          "color": "rgba(255,127,0,0.2)",
+          "small": true
         },
         {
           "name": "Janus/Epimetheus Ring",
@@ -202,7 +210,8 @@ sun = {
           "r": 14,
           "ap": 133584,
           "period": 0.575050718,
-          "color": "gray"
+          "color": "gray",
+          "comment": "The innermost moon larger than a kilometer. It carves the 300 km Encke gap in the A Ring."
         },
         {
           "name": "Janus & Epimetheus",
@@ -210,14 +219,15 @@ sun = {
           "ap": 151460,
           "period": 0.694660342,
           "color": "gray",
-          "comment": "Janus (above) and Epimetheus (below) share this orbit height, but never pass with 10,000 km of each other."
+          "comment": "Janus (above) and Epimetheus (below) share this orbit height, but have a complex relationship such that they never pass with 10,000 km of each other."
         },
         {
           "name": "Enceladus",
           "r": 252,
           "ap":237948,
           "period":1.370218,
-          "color": "#77F"
+          "color": "#77F",
+          "comment": "Tidal forces heat this moon, melting its interior to form a liquid ocean. Geysers erupt from its southern half, making up the particles for the large but faint E ring, extending all the way to Titan."
         },
         {
           "name": "Tethys",
