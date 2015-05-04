@@ -238,11 +238,20 @@
             }
           });
         }
-        if (minBody) {
+        if (selectedRing !== 'none') {
+          var srData = currentView.rings[selectedRing];
+          d3.select("#current").html(srData.name);
+          d3.select("#preview").style("display", "none");
+          var inner = "<strong>Inner radius:</strong> " + srData.s + " km";
+          var outer = "<strong>Outer radius:</strong> " + srData.e + " km";
+          var comment = srData.comment || "";
+          d3.select("#info").html(inner + "<br />" + outer + "<br />" + comment);
+        } else if (minBody) {
           d3.select("#current").html(minBody.toUpperCase());
           d3.select("#preview")
             .attr("src", "pics/" + minBody.toLowerCase() + ".jpg")
-            .attr("alt", minBody);
+            .attr("alt", minBody)
+            .style("display", "block");
           var comment = minData.comment ? "<br/>" + minData.comment : "";
           d3.select("#info").html("<strong>Radius:</strong> " + minData.r + " km" + (!minData.period ?"": ("<br /><strong>Orbital period:</strong> " + minData.period + " days<br/><strong>Apoapsis:</strong> " + minData.ap + " km")) + comment);
           d3.selectAll(".orbit").attr("class", function(d) { return d.name === minBody ? "orbit selected" : "orbit"; })

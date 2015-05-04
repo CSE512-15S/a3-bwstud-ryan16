@@ -147,7 +147,8 @@ sun = {
           "name": "Cassini Division",
           "s": "117507",
           "e": "122340",
-          "color": "rgba(255,127,0,0)"
+          "color": "rgba(255,127,0,0)",
+          "comment": "The gap between the A and B rings. The inner edge would be at 2:1 resonance with Mimas."
         },
         {
           "name": "Huygens Ringlet",
@@ -184,7 +185,7 @@ sun = {
           "small": true
         },
         {
-          "name": "Janus/Epimetheus Ring",
+          "name": "Janus / Epimetheus Ring",
           "s": "149000",
           "e": "154000",
           "color": "rgba(255,127,0,0.1)"
