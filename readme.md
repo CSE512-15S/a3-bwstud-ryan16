@@ -48,7 +48,7 @@ http://localhost:8000/
 
 Our original concept was to use tone frequencies to represent orbital resonances. Orbital resonances occur in celestial mechanics when two bodies have a periodic gravitational influence on one another. It's common to find that these relationships can be expressed as a ratio of two small integers (e.g. Pluto and Neptune exhibit a 2:3 relationship). If considered in musical terms, these ratios could be expressed as wavelengths, and as meters, providing for harmonic/dissonant and rythmic patterns.
 
-We were unable to achieve many of the desired effects. Constructing the visualization proved challenging, and we were forced to narrow the scope of our project several times, from a starting point of the solar system down to just the moons and rings of Saturn. Even then, the structures are complex. We could not include a waveform representation of the orbital periods, instead encoding their relationship as relative speeds via animation. Additional details are available when the user hovers over objects, but we were unable to include a comparison action. 
+We were unable to achieve many of the desired effects. Constructing the visualization proved challenging, and we were forced to narrow the scope of our project several times, from a starting point of the solar system down to just the moons and rings of Saturn. Even then, the structures are complex. We could not include a waveform representation of the orbital periods, instead encoding their relationship as relative speeds via animation. Additional details are available when the user hovers over objects, but we were unable to include a comparison action.
 
 
 ## Development Process
