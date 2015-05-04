@@ -100,77 +100,92 @@ sun = {
         {
           "name": "D Ring",
           "s": "66900",
-          "e": "74658"
+          "e": "74658",
+          "color": "rgba(255,127,0,0.1)"
         },
         {
           "name": "C Ring",
           "s": "74658",
-          "e": "91975"
+          "e": "91975",
+          "color": "rgba(255,127,0,0.2)"
         },
         {
           "name": "Titan Ringlet",
           "s": "77871",
-          "e": "77896"
+          "e": "77896",
+          "color": "rgba(255,127,0,0.8)"
         },
         {
           "name": "Maxwell Ringlet",
           "s": "87491",
-          "e": "87555"
+          "e": "87555",
+          "color": "rgba(255,127,0,0.8)"
         },
         {
           "name": "1.470 Rs Ringlet",
           "s": "88716",
-          "e": "88732"
+          "e": "88732",
+          "color": "rgba(255,127,0,0.8)"
         },
         {
           "name": "1.495 Rs Ringlet",
           "s": "90171",
-          "e": "90232"
+          "e": "90232",
+          "color": "rgba(255,127,0,0.8)"
         },
         {
           "name": "B Ring",
           "s": "91975",
-          "e": "117507"
+          "e": "117507",
+          "color": "rgba(255,127,0,0.4)"
         },
         {
           "name": "Cassini Division",
           "s": "117507",
-          "e": "122340"
+          "e": "122340",
+          "color": "rgba(255,127,0,0)"
         },
         {
           "name": "Huygens Ringlet",
           "s": "117825",
-          "e": "118185"
+          "e": "118185",
+          "color": "rgba(255,127,0,0.8)"
         },
         {
           "name": "A Ring",
           "s": "122340",
-          "e": "136780"
+          "e": "136780",
+          "color": "rgba(255,127,0,0.4)"
         },
         {
           "name": "Encke Gap",
           "s": "133410",
-          "e": "133740"
+          "e": "133740",
+          "color": "rgba(0,0,0,0.5)"
         },
         {
           "name": "Keeler Gap",
           "s": "136487",
-          "e": "136522"
+          "e": "136522",
+          "color": "rgba(0,0,0,1)"
         },
         {
           "name": "F Ring ",
           "s": "139826",
-          "e": "140612"
+          "e": "140612",
+          "color": "rgba(255,127,0,0.2)"
         },
         {
           "name": "Janus/Epimetheus Ring",
           "s": "149000",
-          "e": "154000"
+          "e": "154000",
+          "color": "rgba(255,127,0,0.1)"
         },
         {
           "name": "G Ring",
           "s": "166000",
-          "e": "173200"
+          "e": "173200",
+          "color": "rgba(255,127,0,0.05)"
         }
       ],
       "period": 10759.22,
@@ -188,6 +203,14 @@ sun = {
           "ap": 133584,
           "period": 0.575050718,
           "color": "gray"
+        },
+        {
+          "name": "Janus & Epimetheus",
+          "r":"90, 60",
+          "ap": 151460,
+          "period": 0.694660342,
+          "color": "gray",
+          "comment": "Janus (above) and Epimetheus (below) share this orbit height, but never pass with 10,000 km of each other."
         },
         {
           "name": "Enceladus",

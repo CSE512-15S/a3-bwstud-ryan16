@@ -34,6 +34,8 @@
       text-align: center;
       font-family: 'Montserrat', sans-serif;
       font-size: 1.618em;
+      word-wrap: auto;
+      max-width: 200px;
     }
 
     #vis {
@@ -91,6 +93,7 @@
       background: none;
       font-family: 'Cutive Mono';
       font-size: .618em;
+      width: 200px;
     }
 
     #info{
@@ -113,6 +116,11 @@
   <script src="sound.js"></script>
   <script>
     var currentView = sun.satellites[5];
+
+    currentView.rings && currentView.rings.forEach(function(ring, i) {
+      i = i.toString(16);
+      //ring.color = '#'+ i + i + i;
+    });
     window.onload = function() {
       var RECT, WIDTH, HEIGHT, zoom;
       var CENTER_X, CENTER_Y;
@@ -133,7 +141,7 @@
       }
       handleResize();
       zoom = 0.9*Math.min(WIDTH/2, HEIGHT/2);
-
+      handleResize();
       var ap = function(d) { return d.ap; };
 
       var r = d3.scale.linear()
@@ -148,7 +156,15 @@
         .attr("fill", function(d) { return d.color||"red"; })
         .attr("r", function(d) { return r(d.r); })
         .attr("cx", 0)
-        .attr("cy", 0)
+        .attr("cy", 0);
+    
+      
+      var ringGenerator = d3.svg.arc()
+          .innerRadius(function(d) { return dist(d.s); })
+          .outerRadius(function(d) { return dist(d.e); })
+          .startAngle(0)
+          .endAngle(2*Math.PI);
+
       render();
       svg.append("g").attr("class", "x axis distance-axis").call(distAxis).selectAll("text")
           .attr("y", 0)
@@ -182,10 +198,6 @@
         e.preventDefault();
       }
 
-      function tooltip() {
-        
-      }
-
       var minBody;
       var currentMouseEvent;
       document.addEventListener("mousemove", handleMouseMove);
@@ -216,11 +228,13 @@
           d3.select("#preview")
             .attr("src", "pics/" + minBody.toLowerCase() + ".jpg")
             .attr("alt", minBody);
-          d3.select("#info").html("<strong>Radius:</strong> " + minData.r + " km" + (!minData.period ?"": ("<br /><strong>Orbital period:</strong> " + minData.period + " days<br/><strong>Apoapsis:</strong> " + minData.ap + " km")));
+          var comment = minData.comment ? "<br/>" + minData.comment : "";
+          d3.select("#info").html("<strong>Radius:</strong> " + minData.r + " km" + (!minData.period ?"": ("<br /><strong>Orbital period:</strong> " + minData.period + " days<br/><strong>Apoapsis:</strong> " + minData.ap + " km")) + comment);
           d3.selectAll(".orbit").attr("class", function(d) { return d.name === minBody ? "orbit selected" : "orbit"; })
           d3.selectAll(".pt").attr("class", function(d) { return d.name === minBody ? "pt selected" : "pt"; })
         }
       }
+
 
       function render() {
        dist.domain([currentView.r, d3.max(currentView.satellites, ap)])
@@ -260,7 +274,10 @@
         // rings
         var rings = svg.selectAll(".ring").data(currentView.rings || []);
         rings.enter().append("path")
-          .attr("class", "ring");          
+          .attr("class", "ring")
+          .style("fill", function(d) { return d.color; });
+        rings.attr("d", function(d) { return ringGenerator(d); })
+    
 
         // bodies
         pts.enter().append("path")
@@ -276,11 +293,6 @@
       var orbits = d3.selectAll(".orbit");
       var gradients = d3.selectAll(".gradient");
       var rings = svg.selectAll(".ring");
-      var ringGenerator = d3.svg.arc()
-          .innerRadius(function(d) { return dist(d.s); })
-          .outerRadius(function(d) { return dist(d.e); })
-          .startAngle(0)
-          .endAngle(2*Math.PI);
 
       var tailLengths = 2;
       function positions() {
@@ -288,11 +300,19 @@
           var rVal = dist(d.ap);
           var theta = t/d.period;
           var theta2 = (t-tailLengths*dt)/d.period;
-          var x1 = Math.cos(theta)*rVal,
-              y1 =-Math.sin(theta)*rVal,
-              x2 = Math.cos(theta2)*rVal,
-              y2 =-Math.sin(theta2)*rVal;
-
+          var x1, y1, x2, y2;
+          function calc() {
+            x1 = Math.cos(theta)*rVal;
+            y1 =-Math.sin(theta)*rVal;
+            x2 = Math.cos(theta2)*rVal;
+            y2 =-Math.sin(theta2)*rVal;
+          }
+          calc();
+          var dx = x2-x1, dy = y2-y1;
+          if (dx*dx + dy*dy < 2*r(d.r)*r(d.r)) {
+            theta2 = theta - 1;
+            calc();
+          }
           d3.select(this)
             .attr("x1", x1)
             .attr("y1", y1)
@@ -308,6 +328,9 @@
               x2 = Math.cos(theta2)*rVal,
               y2 =-Math.sin(theta2)*rVal;
           var dx = x2-x1, dy = y2-y1;
+          if (dx*dx + dy*dy < 2*r(d.r)*r(d.r)) {
+            x2=x1; y2=y1;
+          }
           d3.select(this).attr('d', "M " + x1 + " " + y1 + 
             " A"+rVal+","+rVal+ " 0 0 " + (d.period > 0 ? 1: 0) + " " + x2 + " " + y2);
         });
