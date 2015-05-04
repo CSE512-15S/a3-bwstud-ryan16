@@ -62,7 +62,7 @@ And drew some ideas:
 
 ### Changes between Storyboard and the Final Implementation
 
-Unfortunately, some real life resonances, such as the 7:6 resonance between Mimas and the G ring, are virtually indistinguishable from noise. It would not be a one-to-one mapping, so not very useful for conveying the data. (It could still be a cool art project, however). Even the moons that have very near ratios (within 0.5%) sound out-of-tune, causing auditory artifacts. To make a good sounding project, we would have to round the values.
+Unfortunately, some real life resonances, such as the 7:6 resonance between Mimas and the G ring, are virtually indistinguishable from noise. It would not be a one-to-one mapping, so not very useful for conveying the data. (It could still be a cool art project, however). Even the moons that have very near ratios (within 0.5%) sound out-of-tune, causing auditory artifacts. To make a good sounding project, we would have to round the values, which would be misleading.
 
 We were unable to achieve many of the desired effects. Constructing the visualization proved challenging, and we were forced to narrow the scope of our project several times, from a starting point of the solar system down to just the moons and rings of Saturn. Even then, the structures are complex. We could not include a waveform representation of the orbital periods, instead encoding their relationship as relative speeds via animation. Additional details are available when the user hovers over objects, but we were unable to include a comparison action.
 
