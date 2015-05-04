@@ -102,18 +102,36 @@
       font-size: .8em;
       width: 240px;
     }
-
-    #title{
+    #title {
       position: absolute;
       top: 20px;
       left: 20px;
-      padding: 1.5em;
+    }
+    #title h1 {
+      padding-top: 1.5em;
+      padding-left: 1.5em;
       color: rgba(0, 255, 255, 0.7);
       font-family: 'Montserrat', Sans;
       font-size: 1.618em;
       width: auto;
       text-transform: uppercase;
       letter-spacing: 10px;
+    }
+    
+    #title h2 {
+      padding-left: 3.2em;
+      color: rgba(0, 255, 255, 0.7);
+      font-size: 0.8em;
+      font-family: 'Montserrat', Sans;
+    }
+
+    #notes {
+      position: absolute;
+      bottom: 20px;
+      right: 20px;
+      font-size: 0.8em;
+      font-family: 'Montserrat', Sans;
+      color: white;
     }
 
     #info{
@@ -125,14 +143,15 @@
 </head>
 <body>
   <svg id="vis"></svg>
-  <div id="title">The Saturn System</div>
+  <div id="title"><h1>The Saturn System</h1><h2>showing the rings and major moons</h2></div>
   <div id="tooltip">
     <div id="current"></div>
     <img id="preview" width=200 height=200 alt="Satellite Name"/>
     <div id="info"></div>
   </div>
+  <div id="notes">Time sped up 10,000&times;. Sizes and distances are on separate scales.</div>
   <script src="lib/d3.min.js"></script>
-  <script src="lib/timbre.js"></script>
+  <!--<script src="lib/timbre.js"></script>-->
   <script src="data.js"></script>
   <!--<script src="sound.js"></script>-->
   <script>
@@ -170,7 +189,8 @@
         .range([1, 30]);
 
       var dist = d3.scale.linear();
-      var distAxis = d3.svg.axis().scale(dist);
+      var tickFormatter = d3.format(",.0f");
+      var distAxis = d3.svg.axis().scale(dist).tickFormat(function(d){ return tickFormatter(d) + "km"; });
       // render the central body
       svg.append("circle")
         .datum(currentView)
@@ -341,7 +361,7 @@
       }
 
       var t = 0;
-      var dt = 0.1;
+      var dt = 0.0606;
 
       var pts = d3.selectAll(".pt");
       var orbits = d3.selectAll(".orbit");
