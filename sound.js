@@ -7,14 +7,14 @@ console.log(note(1232));
 
 var synth = T("OscGen", {wave:"sin", mul:0.5});
 
-T("interval", {interval: 300, timeout:"5sec"}, function() {
-    synth.noteOnWithFreq(400, 80);
+T("interval", {interval: 500, timeout:"5sec"}, function() {
+    synth.noteOnWithFreq(200, 80);
 }).on("ended", function() {
     this.stop();
 }).set({buddies:synth}).start();
 
-T("interval", {interval: 400, timeout:"5sec"}, function() {
-    synth.noteOnWithFreq(300, 80);
+T("interval", {interval: 100, timeout:"5sec"}, function() {
+    synth.noteOnWithFreq(500, 80);
 }).on("ended", function() {
     this.stop();
 }).set({buddies:synth}).start();

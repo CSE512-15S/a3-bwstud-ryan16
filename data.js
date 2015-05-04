@@ -23,7 +23,7 @@ sun = {
       "period": 686.971,
       "satellites": [
         {"name": "Phobos", "r":11.1, "ap":9377, "color":"#B66", "period":0.31891023},
-        {"name": "Diemos", "r":6.2, "ap":23460, "color":"#B66", "period":1.263}
+        {"name": "Deimos", "r":6.2, "ap":23460, "color":"#B66", "period":1.263}
       ]
     },
     {
@@ -65,7 +65,7 @@ sun = {
           "name": "Amalthea",
           "r": 83.45,
           "ap": 181366,
-          "color": "gray",
+          "color": "#f00",
           "period": 0.49817943
         },
         {
@@ -162,7 +162,7 @@ sun = {
           "r": 788.4,
           "ap":435910,
           "period":8.705872,
-          "color": "gray"
+          "color": "#644"
         },
         {
           "name": "Oberon",
@@ -183,7 +183,7 @@ sun = {
           "r": 584.7,
           "ap":266300,
           "period":4.144177,
-          "color": "#444"
+          "color": "#446"
         },
         {
           "name": "Miranda",

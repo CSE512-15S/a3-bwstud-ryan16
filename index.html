@@ -8,7 +8,24 @@
     html, body { width: 100%; height: 100%; margin: 0; } 
    
     .pt {
-      fill: red;
+      stroke: red;
+      fill: none;
+      stroke-linecap: round;
+    }
+
+    .pt.selected {
+      //stroke: rgba(0, 255, 255, 0.15);
+      //stroke-width: 12px;
+    }
+
+    #preview {
+      background-image: url(pics/spin.gif);
+      background-color: black;
+	    background-repeat: no-repeat;
+      background-position: center;
+      display:block;
+      border:none;
+      object-fit: contain;
     }
 
     #vis {
@@ -25,12 +42,15 @@
     .orbit {
       fill: none;
       stroke: rgba(0, 255, 255, 0.25);
+      /* stroke-dasharray: 10,10; */
     }
 
     .orbit.selected {
       /* stroke: rgba(127, 255, 127, 0.25); */
-      stroke-dasharray: 2,2;
+      stroke-dasharray: 1 1;
     }
+
+
 
     .sun {
       fill: yellow;
@@ -49,17 +69,26 @@
       stroke-width: 1px;
     }
 
+    #tooltip {
+      position: absolute;
+      top: 0;
+      left: 0;
+      color: white;
+      background-color: rgba(0, 0, 0, 1)
+    }
+
     .distance-axis .domain { stroke: white; fill: none; }
   </style>
 </head>
 <body>
-  <svg id="vis"><text x=0 y=20 fill=white id="current">Current</text></svg>
+  <svg id="vis"></svg>
+  <div id="tooltip"><div id="current"></div><img id="preview" width=200 height=200 /><div id="info"></div></div>
   <script src="lib/d3.min.js"></script>
   <script src="lib/timbre.js"></script>
   <script src="data.js"></script>
   <script src="sound.js"></script>
   <script>
-    var currentView = sun.satellites[5];
+    var currentView = sun.satellites[7];
     window.onload = function() {
       var RECT, WIDTH, HEIGHT, zoom;
 
@@ -106,8 +135,13 @@
           zoom *= 1.1;
         }
         render();
+        positions();
         handleMouseMove(currentMouseEvent);
         e.preventDefault();
+      }
+
+      function tooltip() {
+        
       }
 
       var minBody;
@@ -120,19 +154,30 @@
             r = Math.sqrt(x*x + y*y);
         var mouseDist = dist.invert(r);
         var min;
-        if (mouseDist < currentView.r) {
+        var minData;
+        if (mouseDist < currentView.r || currentView.satellites.length == 0) {
           minBody = currentView.name;
+          minData = currentView;
         } else currentView.satellites.forEach(function(body) {
           if (min == null) {
             min = Math.abs(body.ap - mouseDist);
             minBody = body.name;
+            minData = body;
           } else if (Math.abs(body.ap - mouseDist) < min) {
             min = Math.abs(body.ap - mouseDist);
             minBody = body.name;
+            minData = body;
           }
         });
-        d3.select("#current").html(minBody);
-        d3.selectAll(".orbit").attr("class", function(d) { return d.name === minBody ? "orbit selected" : "orbit"; })
+        if (minBody) {
+          d3.select("#current").html(minBody);
+          d3.select("#preview")
+            .attr("src", "pics/" + minBody.toLowerCase() + ".jpg")
+            .attr("alt", minBody);
+          d3.select("#info").html("<strong>Radius:</strong> " + minData.r + " km" + (!minData.period ?"": ("<br /><strong>Orbital period:</strong> " + minData.period + " days<br/><strong>Apoapsis:</strong> " + minData.ap + " km")));
+          d3.selectAll(".orbit").attr("class", function(d) { return d.name === minBody ? "orbit selected" : "orbit"; })
+          d3.selectAll(".pt").attr("class", function(d) { return d.name === minBody ? "pt selected" : "pt"; })
+        }
       }
 
       function render() {
@@ -140,7 +185,9 @@
            .range([r(currentView.r), zoom]);
 
         var pts = svg.selectAll(".pt")
-          .data(currentView.satellites)
+          .data(currentView.satellites);
+        var gradients = svg.selectAll(".gradient")
+          .data(currentView.satellites);
 
         // orbit lines
         function orbit(d) {
@@ -156,25 +203,69 @@
           .call(orbit);
         orbits.exit().remove();
 
+        //gradients
+        var grad = gradients.enter().append("linearGradient")
+          .attr("id", function(_,i) { return "grad" + i })
+          .attr("class", "gradient")
+          .attr("gradientUnits", "userSpaceOnUse")
+        grad.append("stop")
+          .attr("stop-color", function(d) { return d.color || 'red'; })
+          .attr("offset", "0%");
+        grad.append("stop")
+          .attr("stop-color", function(d) { return d.color || 'red'; })
+          .attr("offset", "100%")
+          .attr("stop-opacity", "0")
+          
+
         // bodies
-        function body(d) {
-          d.attr("cx", function(d) { return Math.cos(d.period)*dist(d.ap); })
-           .attr("cy", function(d) { return -Math.sin(d.period)*dist(d.ap); })
-        }
-        
-        pts.call(body);
-        pts.enter().append("circle")
-           .attr("r", function(d) { return r(d.r); })
+        pts.enter().append("path")
            .attr("class", "pt")
-           .attr("style", function(d) { return "fill:" + (d.color || "red"); })
-           .call(body);
+           .attr("style", function(d, i) { return "stroke: url(#grad" + i + "); stroke-width:" + 2*r(d.r) + "px"; })
         pts.exit().remove()
       }
 
+      var t = 0;
+      var dt = 0.01;
+
+      var pts = d3.selectAll(".pt");
+      var orbits = d3.selectAll(".orbit");
+      var gradients = d3.selectAll(".gradient");
+
+      var tailLengths = 2;
+      function positions() {
+        gradients.each(function(d) {
+          var rVal = dist(d.ap);
+          var theta = t/d.period;
+          var theta2 = (t-tailLengths*dt)/d.period;
+          var x1 = Math.cos(theta)*rVal,
+              y1 =-Math.sin(theta)*rVal,
+              x2 = Math.cos(theta2)*rVal,
+              y2 =-Math.sin(theta2)*rVal;
+
+          d3.select(this)
+            .attr("x1", x1)
+            .attr("y1", y1)
+            .attr("x2", x2)
+            .attr("y2", y2)
+        });
+        pts.each(function(d) {
+          var rVal = dist(d.ap);
+          var theta = t/d.period;
+          var theta2 = (t-tailLengths*dt)/d.period;
+          var x1 = Math.cos(theta)*rVal,
+              y1 =-Math.sin(theta)*rVal,
+              x2 = Math.cos(theta2)*rVal,
+              y2 =-Math.sin(theta2)*rVal;
+          var dx = x2-x1, dy = y2-y1;
+          d3.select(this).attr('d', "M " + x1 + " " + y1 + 
+            " A"+rVal+","+rVal+ " 0 0 " + (d.period > 0 ? 1: 0) + " " + x2 + " " + y2);
+        });
+      }
       requestAnimationFrame(function frame() {
         // rendering
-        
-        d3.select(".pt")
+        t += dt;    
+        positions();
+
         requestAnimationFrame(frame);
       });
 
