@@ -46,7 +46,9 @@ http://localhost:8000/
 
 ### Changes between Storyboard and the Final Implementation
 
-We were unable to achieve many of the desired effects, only settling on a focus late in the aassignment period. 
+Our original idea involved using sound to represent orbital resonances.
+
+We were unable to achieve many of the desired effects, only settling on a focus late in the assignment period. 
 
 
 ## Development Process

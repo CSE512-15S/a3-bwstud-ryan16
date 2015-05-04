@@ -148,7 +148,7 @@ sun = {
           "s": "117507",
           "e": "122340",
           "color": "rgba(255,127,0,0)",
-          "comment": "The gap between the A and B rings. The inner edge would be at 2:1 resonance with Mimas."
+          "comment": "The gap between the A and B rings. The inner edge would be at 2:1 resonance with Mimas, so particles in this area are destabilized and find different orbits."
         },
         {
           "name": "Huygens Ringlet",
@@ -168,7 +168,8 @@ sun = {
           "s": "133410",
           "e": "133740",
           "color": "rgba(0,0,0,0.5)",
-          "small": true
+          "small": true,
+          "co-orbit": "Pan"
         },
         {
           "name": "Keeler Gap",
@@ -188,7 +189,9 @@ sun = {
           "name": "Janus / Epimetheus Ring",
           "s": "149000",
           "e": "154000",
-          "color": "rgba(255,127,0,0.1)"
+          "color": "rgba(255,127,0,0.1)",
+          "comment": "A ring consisting of particles blasted off of the surface of Janus and Epimetheus by meteoroids.",
+          "co-orbit": "Janus & Epimetheus"
         },
         {
           "name": "G Ring",
@@ -216,11 +219,11 @@ sun = {
         },
         {
           "name": "Janus & Epimetheus",
-          "r":"90, 60",
+          "r":"90 km & 60",
           "ap": 151460,
           "period": 0.694660342,
           "color": "gray",
-          "comment": "Janus (above) and Epimetheus (below) share this orbit height, but have a complex relationship such that they never pass with 10,000 km of each other."
+          "comment": "Janus (above) and Epimetheus (below) share this orbit height, but have a complex relationship such that they never pass with 10,000 km of each other.<br />The Janus and Epimetheus ring also shares this orbit, from 149000 km to 154000 km. It consists of material blasted off of the moons by meteoroids."
         },
         {
           "name": "Enceladus",

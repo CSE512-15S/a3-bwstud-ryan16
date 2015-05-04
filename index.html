@@ -57,9 +57,9 @@
 
     .orbit.selected {
       /* stroke: rgba(127, 255, 127, 0.25); */
-      stroke-dasharray: 1 1;
-      stroke-width: 2;
-      stroke: rgba(0, 255, 255, 0.5)
+      stroke-width: 3;
+      stroke-dasharray: 10 3;
+      stroke: rgba(0, 255, 255, 0.25)
     }
 
     .ring {
@@ -113,7 +113,7 @@
   <script src="lib/d3.min.js"></script>
   <script src="lib/timbre.js"></script>
   <script src="data.js"></script>
-  <script src="sound.js"></script>
+  <!--<script src="sound.js"></script>-->
   <script>
     var currentView = sun.satellites[5];
 
@@ -182,9 +182,14 @@
         } else {
           zoom *= 1.1;
         }
-        dist.domain([currentView.r, d3.max(currentView.satellites, ap)])
+        var maximum = d3.max(currentView.satellites, ap)
+        dist.domain([currentView.r, maximum])
            .range([r(currentView.r), zoom]);
-        distAxis.ticks(zoom/100);
+        var bottom = currentView.r;
+        var top = Math.min(dist.invert(WIDTH-CENTER_X), maximum);
+        function c10k(d) { return 10000*Math.ceil(d/10000); }
+        distAxis.tickValues(d3.range(c10k(bottom), c10k(top), c10k((top-bottom)/10)));
+
         d3.select(".x.axis").call(distAxis).selectAll("text")
           .attr("y", 0)
           .attr("x", 9)
@@ -246,14 +251,16 @@
           var outer = "<strong>Outer radius:</strong> " + srData.e + " km";
           var comment = srData.comment || "";
           d3.select("#info").html(inner + "<br />" + outer + "<br />" + comment);
-        } else if (minBody) {
+          minBody = srData['co-orbit'];      
+        }
+        if (minBody) {
           d3.select("#current").html(minBody.toUpperCase());
           d3.select("#preview")
             .attr("src", "pics/" + minBody.toLowerCase() + ".jpg")
             .attr("alt", minBody)
             .style("display", "block");
           var comment = minData.comment ? "<br/>" + minData.comment : "";
-          d3.select("#info").html("<strong>Radius:</strong> " + minData.r + " km" + (!minData.period ?"": ("<br /><strong>Orbital period:</strong> " + minData.period + " days<br/><strong>Apoapsis:</strong> " + minData.ap + " km")) + comment);
+          d3.select("#info").html("<strong>Radius:</strong> " + minData.r + " km" + (!minData.period ?"": ("<br /><strong>Orbital period:</strong> " + minData.period + " days<br/><strong>Semi-major axis:</strong> " + minData.ap + " km")) + comment);
           d3.selectAll(".orbit").attr("class", function(d) { return d.name === minBody ? "orbit selected" : "orbit"; })
           d3.selectAll(".pt").attr("class", function(d) { return d.name === minBody ? "pt selected" : "pt"; })
         }
