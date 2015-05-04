@@ -13,8 +13,9 @@ a3-ryan16-bwstud
 
 ## Running Instructions
 
-To run locally:
+Visit http://cse512-15s.github.io/a3-bwstud-ryan16/ for a hosted version.
 
+To run locally:
 
 clone the repo to your machine
  
