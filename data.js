@@ -259,7 +259,8 @@ sun = {
           "r": 2575,
           "ap":1221870,
           "period":15.94542,
-          "color": "#d90"
+          "color": "#d90",
+          "comment": "Saturn's largest moon, and the only moon with a significant atmosphere."
         },
         {
           "name": "Iapetus",
