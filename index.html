@@ -50,7 +50,9 @@
       stroke-dasharray: 1 1;
     }
 
-
+    .ring {
+      fill: rgba(127, 0, 0, 0.1)
+    }
 
     .sun {
       fill: yellow;
@@ -62,6 +64,7 @@
 
     .distance-axis text {
       fill: white;
+      font-family: "Segoe UI", Sans;
     }
 
     .distance-axis .tick line {
@@ -88,10 +91,10 @@
   <script src="data.js"></script>
   <script src="sound.js"></script>
   <script>
-    var currentView = sun.satellites[7];
+    var currentView = sun.satellites[5];
     window.onload = function() {
       var RECT, WIDTH, HEIGHT, zoom;
-
+      var CENTER_X, CENTER_Y;
       var svg = d3.select("#vis")
         .append("g") // use a group to translate our coordinates to the center
           .attr("class", "container")
@@ -102,8 +105,10 @@
         RECT = document.getElementById("vis").getBoundingClientRect();
         WIDTH = RECT.right - RECT.left;
         HEIGHT = RECT.bottom - RECT.top; 
+        CENTER_X = WIDTH/6;
+        CENTER_Y = HEIGHT/2;
         d3.select(".container")
-          .attr("transform", "translate(" + WIDTH/2 + "," + HEIGHT/2 + ")");
+          .attr("transform", "translate(" + CENTER_X + "," + CENTER_Y + ")");
       }
       handleResize();
       zoom = 0.9*Math.min(WIDTH/2, HEIGHT/2);
@@ -114,16 +119,22 @@
         .domain([0, currentView.r])
         .range([1, 30]);
 
-      var dist = d3.scale.linear()
-      
+      var dist = d3.scale.linear();
+      var distAxis = d3.svg.axis().scale(dist);
+      // render the central body
       svg.append("circle")
         .datum(currentView)
         .attr("fill", function(d) { return d.color||"red"; })
         .attr("r", function(d) { return r(d.r); })
         .attr("cx", 0)
         .attr("cy", 0)
-
       render();
+      svg.append("g").attr("class", "x axis distance-axis").call(distAxis).selectAll("text")
+          .attr("y", 0)
+          .attr("x", 9)
+          .attr("dy", ".35em")
+          .attr("transform", "rotate(90)")
+          .style("text-anchor", "start");
 
       document.addEventListener("DOMMouseScroll", handleWheel);
       document.addEventListener("mousewheel", handleWheel);
@@ -134,7 +145,16 @@
         } else {
           zoom *= 1.1;
         }
-        render();
+        dist.domain([currentView.r, d3.max(currentView.satellites, ap)])
+           .range([r(currentView.r), zoom]);
+        distAxis.ticks(zoom/100);
+        d3.select(".x.axis").call(distAxis).selectAll("text")
+          .attr("y", 0)
+          .attr("x", 9)
+          .attr("dy", ".35em")
+          .attr("transform", "rotate(90)")
+          .style("text-anchor", "start");
+        rings.attr("d", function(d) { return ringGenerator(d); })
         positions();
         handleMouseMove(currentMouseEvent);
         e.preventDefault();
@@ -149,8 +169,8 @@
       document.addEventListener("mousemove", handleMouseMove);
       function handleMouseMove(e) {
         currentMouseEvent = e;
-        var x = e.layerX - WIDTH/2,
-            y = e.layerY - HEIGHT/2,
+        var x = e.layerX - CENTER_X,
+            y = e.layerY - CENTER_Y,
             r = Math.sqrt(x*x + y*y);
         var mouseDist = dist.invert(r);
         var min;
@@ -194,7 +214,6 @@
           d.attr("r", function(d) { return dist(d.ap); })
         }
         var orbits = svg.selectAll(".orbit").data(currentView.satellites);
-        orbits.call(orbit);
         orbits.enter()
           .append("circle")
           .attr("class", "orbit")
@@ -215,7 +234,11 @@
           .attr("stop-color", function(d) { return d.color || 'red'; })
           .attr("offset", "100%")
           .attr("stop-opacity", "0")
-          
+  
+        // rings
+        var rings = svg.selectAll(".ring").data(currentView.rings || []);
+        rings.enter().append("path")
+          .attr("class", "ring");          
 
         // bodies
         pts.enter().append("path")
@@ -225,11 +248,17 @@
       }
 
       var t = 0;
-      var dt = 0.01;
+      var dt = 0.1;
 
       var pts = d3.selectAll(".pt");
       var orbits = d3.selectAll(".orbit");
       var gradients = d3.selectAll(".gradient");
+      var rings = svg.selectAll(".ring");
+      var ringGenerator = d3.svg.arc()
+          .innerRadius(function(d) { return dist(d.s); })
+          .outerRadius(function(d) { return dist(d.e); })
+          .startAngle(0)
+          .endAngle(2*Math.PI);
 
       var tailLengths = 2;
       function positions() {
@@ -260,6 +289,7 @@
           d3.select(this).attr('d', "M " + x1 + " " + y1 + 
             " A"+rVal+","+rVal+ " 0 0 " + (d.period > 0 ? 1: 0) + " " + x2 + " " + y2);
         });
+        orbits.attr("r", function(d) { return dist(d.ap); })
       }
       requestAnimationFrame(function frame() {
         // rendering
