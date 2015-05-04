@@ -15,20 +15,22 @@ a3-ryan16-bwstud
 
 To run locally:
 1. clone the repo to your machine
-    
-    
-    git clone https://github.com/CSE512-15S/a3-bwstud-ryan16.git
+ 
+```
+git clone https://github.com/CSE512-15S/a3-bwstud-ryan16.git
+```
 
 2. Run a webserver from the root directory.
 
-
-
-    python -m SimpleHTTPServer
+```	
+python -m SimpleHTTPServer
+```
 
 3. Navigate to the corresponding port in a web browser.
 
-
-    http://localhost:8000/
+```
+http://localhost:8000/
+```
 
 ## Story Board
 
