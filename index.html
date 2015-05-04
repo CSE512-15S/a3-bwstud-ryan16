@@ -74,7 +74,7 @@
 
     .distance-axis text {
       fill: white;
-      font-family: "Segoe UI", Sans;
+      font-family: Sans;
     }
 
     .distance-axis .tick line {
@@ -84,8 +84,8 @@
 
     #tooltip {
       position: absolute;
-      top: 20;
-      left: 20;
+      top: 20px;
+      right: 20px;
       padding: 3em;
       color: white;
       background: none;
@@ -125,8 +125,8 @@
       function handleResize() {
         RECT = document.getElementById("vis").getBoundingClientRect();
         WIDTH = RECT.right - RECT.left;
-        HEIGHT = RECT.bottom - RECT.top; 
-        CENTER_X = WIDTH/6;
+        HEIGHT = RECT.bottom - RECT.top;
+        CENTER_X = WIDTH/(Math.max(2,Math.min(6,(zoom||200)/200)));
         CENTER_Y = HEIGHT/2;
         d3.select(".container")
           .attr("transform", "translate(" + CENTER_X + "," + CENTER_Y + ")");
@@ -178,6 +178,7 @@
         rings.attr("d", function(d) { return ringGenerator(d); })
         positions();
         handleMouseMove(currentMouseEvent);
+        handleResize();
         e.preventDefault();
       }
 
