@@ -37,18 +37,32 @@ http://localhost:8000/
 
 ## Story Board
 
+Our original concept was to use tone frequencies to represent orbital resonances. Orbital resonances occur in celestial mechanics when two bodies have a periodic gravitational influence on one another. It's common to find that these relationships can be expressed as a ratio of two small integers (e.g. Pluto and Neptune exhibit a 2:3 relationship). If considered in musical terms, these ratios could be expressed as wavelengths, and as meters, providing for harmonic/dissonant and rythmic patterns. The user could visit a planet in the solar system and play the bodies as an instrument.
+
+We explored several sounds of the planets. Here are some samples:
+
+[Perfect 1:2 ratio](http://cse512-15s.github.io/a3-bwstud-ryan16/sounds/perfect1-2.mp3)
+
+[Io and Europa, actual](http://cse512-15s.github.io/a3-bwstud-ryan16/sounds/io-callisto.mp3)
+
+[Transition from Io and Europa to perfect 1:2 over 30s](http://cse512-15s.github.io/a3-bwstud-ryan16/sounds/going-into-tune.mp3)
+
+[Io and Callisto](http://cse512-15s.github.io/a3-bwstud-ryan16/sounds/io-callisto.mp3)
+
+And drew some ideas:
+
 [intro](https://www.dropbox.com/s/gaojikna2hvb37q/IMAG0272.jpg?dl=0)
 
 [interaction](https://www.dropbox.com/s/vyqsgmw13x06ckt/IMAG0273.jpg?dl=0)
 
 [toggle modes](https://www.dropbox.com/s/cfb0pmqgw3bz35w/IMAG0274.jpg?dl=0)
 
-[example tone ratio](https://www.dropbox.com/s/brpvwzmohppiduc/io-europa.mp3?dl=0)
+
 
 
 ### Changes between Storyboard and the Final Implementation
 
-Our original concept was to use tone frequencies to represent orbital resonances. Orbital resonances occur in celestial mechanics when two bodies have a periodic gravitational influence on one another. It's common to find that these relationships can be expressed as a ratio of two small integers (e.g. Pluto and Neptune exhibit a 2:3 relationship). If considered in musical terms, these ratios could be expressed as wavelengths, and as meters, providing for harmonic/dissonant and rythmic patterns. Unfortunately, some real life resonances, such as the 7:6 resonance between Mimas and the G ring, are virtually indistinguishable from noise. It would not be a one-to-one mapping, so not very useful for conveying the data. (It could still be a cool art project, however).
+Unfortunately, some real life resonances, such as the 7:6 resonance between Mimas and the G ring, are virtually indistinguishable from noise. It would not be a one-to-one mapping, so not very useful for conveying the data. (It could still be a cool art project, however). Even the moons that have very near ratios (within 0.5%) sound out-of-tune, causing auditory artifacts. To make a good sounding project, we would have to round the values.
 
 We were unable to achieve many of the desired effects. Constructing the visualization proved challenging, and we were forced to narrow the scope of our project several times, from a starting point of the solar system down to just the moons and rings of Saturn. Even then, the structures are complex. We could not include a waveform representation of the orbital periods, instead encoding their relationship as relative speeds via animation. Additional details are available when the user hovers over objects, but we were unable to include a comparison action.
 
